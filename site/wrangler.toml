@@ -1,8 +1,7 @@
 name = "gel-site"
 compatibility_date = "2026-11-01"
+routes = [{ pattern = "gel.flisk.si", custom_domain = true }]
 
 [assets]
 directory = "./public"
 not_found_handling = "404-page"
-
-# Custom domain gel.flisk.si is added at deploy time.
