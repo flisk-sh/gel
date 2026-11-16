@@ -3,7 +3,7 @@ import { appendFileSync, readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { loadConfig } from "../lib/config.mjs";
-import { pickLane } from "../lib/lane.mjs";
+import { pickLane, lanePlan } from "../lib/lane.mjs";
 import { matchAny } from "../lib/glob.mjs";
 import { walk } from "../lib/fs.mjs";
 import { GUARD_NAMES, loadGuard } from "../lib/guards.mjs";
@@ -40,7 +40,16 @@ async function main() {
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, metricsMarkdown(report) + "\n");
     process.exit(0);
   }
-  if (cmd !== "run") { console.log("usage: gel run [--root .] [--base <sha>] [--ctx ctx.json] [--record gel-record.jsonl] | gel selftest [--json] | gel metrics <gel-record.jsonl ...> [--labels gel-labels.json] [--json]"); process.exit(2); }
+  if (cmd === "lane") {
+    const root = resolve(opt("root", "."));
+    const cfg = loadConfig(root);
+    const plan = lanePlan(changedFiles(root, opt("base")), { laneC: cfg.laneC ?? undefined, laneA: cfg.laneA ?? undefined, minLane: opt("min") ?? cfg.minLane });
+    if (args.includes("--json")) console.log(JSON.stringify(plan));
+    else console.log(`lane ${plan.lane}: ${plan.reason}\nruns: ${plan.scripts.join(" ")}${plan.pythonTests ? " pytest" : ""}${plan.codeql ? " codeql" : ""}`);
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, [`lane=${plan.lane}`, `lane_reason=${plan.reason}`, `scripts=${plan.scripts.join(" ")}`, `python_tests=${plan.pythonTests}`, `codeql=${plan.codeql}`].join("\n") + "\n");
+    process.exit(0);
+  }
+  if (cmd !== "run") { console.log("usage: gel lane [--root .] [--base <sha>] [--min A|B|C] [--json] | gel run [--root .] [--base <sha>] [--ctx ctx.json] [--record gel-record.jsonl] | gel selftest [--json] | gel metrics <gel-record.jsonl ...> [--labels gel-labels.json] [--json]"); process.exit(2); }
 
   const root = resolve(opt("root", "."));
   const cfg = loadConfig(root);

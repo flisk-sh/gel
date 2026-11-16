@@ -80,6 +80,16 @@ npx github:flisk-sh/gel run --root .
 
 GEL picks a risk lane from the changed files, never from a label: **A** docs and tests, **B** product code, **C** workflows, `gel.json`, auth, payment, secrets, migrations, Dockerfiles and deploy config, where a person approves.
 
+The lane also sets how much CI runs. `gel lane --base <sha>` prints the plan and writes it to the job outputs, and the shared Flisk CI (`flisk-sh/.github`) follows it:
+
+| Lane | Package scripts | Python | CodeQL |
+| --- | --- | --- | --- |
+| A docs, tests, copy | lint, typecheck (and test when a test file changed) | pytest only when a test changed | skipped |
+| B product code | lint, typecheck, test, build | pytest | yes |
+| C sensitive paths | B plus test:integration, test:e2e, integration, e2e | pytest | yes |
+
+A push to the default branch, the weekly run and a manual run have no diff to judge, so they always run lane C. `"minLane": "B"` (or `"C"`) in `gel.json` sets a floor for a repo; a change can raise the lane, never lower it.
+
 ## Eval of the guards
 
 Each guard has `guards/<name>/cases.json`, labelled good and bad. `node bin/gel.mjs selftest` must catch every bad case and pass every good one, or GEL's own CI fails. Every false alarm the bench found became a case first, then a fix.
