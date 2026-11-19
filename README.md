@@ -150,4 +150,6 @@ node scripts/flywheel.mjs --max 5 [--dry-run]             # the nightly loop ove
 
 The shared [flisk-sh/.github](https://github.com/flisk-sh/.github) workflows cover the stages after GEL: `release-gate.yml` waits for every check on the release commit and fails on a red or missing required one, and `deploy-health.yml` checks the deployed URL. The `flisk-release` starter wires both around a publish job.
 
-MIT.
+## License
+
+MIT. See [LICENSE](LICENSE).
