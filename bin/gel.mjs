@@ -275,7 +275,8 @@ async function main() {
   if (cmd === "click-map") {
     // gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]
     // Reads one page's click numbers from the site and keeps what the click-map guard judges. --merge keeps the other pages already in the file.
-    if (!opt("url") && !opt("file")) { console.log("usage: gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]"); process.exit(2); }
+    // A private click map (Flisk Analytics) needs GEL_CLICKS_TOKEN in the environment; it is sent as a bearer key.
+    if (!opt("url") && !opt("file")) { console.log("usage: [GEL_CLICKS_TOKEN=key] gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]"); process.exit(2); }
     let e;
     try { e = await measureClicks({ url: opt("url"), file: opt("file") }); } catch (err) { console.error(`click-map: ${err.message}`); process.exit(1); }
     const out = opt("write");

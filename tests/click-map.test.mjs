@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 import { loadConfig } from "../lib/config.mjs";
 import { loadGuard } from "../lib/guards.mjs";
 import { judge, limits } from "../guards/click-map/index.mjs";
-import { toEntry } from "../lib/click-map.mjs";
+import { authHeaders, measure, toEntry } from "../lib/click-map.mjs";
 
 const gel = join(import.meta.dirname, "..", "bin", "gel.mjs");
 // the shape Grow's /api/clicks answers with
@@ -102,4 +102,58 @@ test("in block mode gel run fails on a page full of dead clicks and passes on a 
   writeFileSync(join(d, "notes.txt"), "hi\n"); git("add", "-A"); git("commit", "-qm", "c");
   const res = gelRun(["run", "--root", d, "--base", base]);
   assert.match(res.stdout, /\| click-map \| block \| pass \|/, res.stdout);
+});
+
+// Flisk Analytics serves a private click map: it needs GEL_CLICKS_TOKEN, sent as a bearer key over https only.
+const fakeFetch = (status, body = ANSWER) => {
+  const calls = [];
+  const f = async (url, init) => { calls.push({ url, headers: init.headers }); return new Response(JSON.stringify(body), { status }); };
+  f.calls = calls;
+  return f;
+};
+const PRIVATE = "https://analytics.flisk.si/api/clicks?site=flisk.sh&page=/&dev=desktop&days=30";
+
+test("measure sends GEL_CLICKS_TOKEN as a bearer key, and nothing when it is not set", async () => {
+  const f = fakeFetch(200);
+  const e = await measure({ url: PRIVATE, token: "fa_abc", fetchImpl: f });
+  assert.equal(e.clicks, 28);
+  assert.equal(f.calls[0].headers.authorization, "Bearer fa_abc");
+  const g = fakeFetch(200);
+  await measure({ url: "https://grow.flisk.si/api/clicks?page=home&dev=desktop&days=30", token: "", fetchImpl: g });
+  assert.equal(g.calls[0].headers.authorization, undefined);
+});
+
+test("measure explains a 401: no key, or a refused key", async () => {
+  await assert.rejects(measure({ url: PRIVATE, token: "", fetchImpl: fakeFetch(401, { error: "sign in" }) }), /answered 401: set GEL_CLICKS_TOKEN/);
+  await assert.rejects(measure({ url: PRIVATE, token: "fa_bad", fetchImpl: fakeFetch(401, { error: "sign in" }) }), /answered 401: GEL_CLICKS_TOKEN was refused/);
+  await assert.rejects(measure({ url: PRIVATE, token: "fa_abc", fetchImpl: fakeFetch(404, { error: "site not found" }) }), /answered 404$/);
+});
+
+test("the key is never sent over plain http, except to this computer", async () => {
+  assert.throws(() => authHeaders("http://analytics.example/api/clicks", "fa_abc"), /not https/);
+  const f = fakeFetch(200);
+  await assert.rejects(measure({ url: "http://analytics.example/api/clicks", token: "fa_abc", fetchImpl: f }), /not https/);
+  assert.equal(f.calls.length, 0);
+  assert.deepEqual(authHeaders("http://localhost:8787/api/clicks", "k"), { authorization: "Bearer k" });
+  assert.deepEqual(authHeaders("http://app.localhost/api/clicks", "k"), { authorization: "Bearer k" });
+  assert.deepEqual(authHeaders("http://analytics.example/api/clicks", ""), {});
+});
+
+test("gel click-map reads GEL_CLICKS_TOKEN from the environment, never prints it", () => {
+  const d = repo({ click_map: {} });
+  // a local server that only answers with the right key
+  const srv = spawnSync(process.execPath, ["-e", `
+    const http = require("node:http");
+    const s = http.createServer((q, r) => { const ok = q.headers.authorization === "Bearer fa_secret"; r.writeHead(ok ? 200 : 401, { "content-type": "application/json" }); r.end(JSON.stringify(ok ? ${JSON.stringify(ANSWER)} : { error: "sign in" })); });
+    s.listen(0, "127.0.0.1", () => {
+      const url = "http://127.0.0.1:" + s.address().port + "/api/clicks?site=x.example&page=/&dev=desktop&days=30";
+      const { spawn } = require("node:child_process");
+      const run = (env) => new Promise((res) => { let out = ""; const c = spawn(process.execPath, [${JSON.stringify(gel)}, "click-map", "--url", url], { cwd: ${JSON.stringify(d)}, env: { ...process.env, ...env } }); c.stdout.on("data", (b) => out += b); c.stderr.on("data", (b) => out += b); c.on("close", (code) => res({ code, out })); });
+      Promise.all([run({ GEL_CLICKS_TOKEN: "fa_secret" }), run({ GEL_CLICKS_TOKEN: "" })]).then((r) => { console.log(JSON.stringify(r)); s.close(); });
+    });`], { encoding: "utf8" });
+  const [withKey, without] = JSON.parse(srv.stdout);
+  assert.match(withKey.out, /28 clicks/);
+  assert.doesNotMatch(withKey.out, /fa_secret/);
+  assert.equal(without.code, 1);
+  assert.match(without.out, /answered 401: set GEL_CLICKS_TOKEN/);
 });
