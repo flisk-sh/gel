@@ -25,6 +25,8 @@ import { run as productBrief, briefRows } from "../guards/product-brief/index.mj
 import { judge as judgeClicks, limits as clickLimits } from "../guards/click-map/index.mjs";
 import { measure as measureClicks } from "../lib/click-map.mjs";
 import { gradeRepo } from "../lib/grades.mjs";
+import { scorecard, scorecardMarkdown } from "../lib/queue.mjs";
+import { collectQueue } from "../lib/queue-collect.mjs";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -275,10 +277,10 @@ async function main() {
   if (cmd === "click-map") {
     // gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]
     // Reads one page's click numbers from the site and keeps what the click-map guard judges. --merge keeps the other pages already in the file.
-    // A private click map (Flisk Analytics) needs GEL_CLICKS_TOKEN in the environment; it is sent as a bearer key.
-    if (!opt("url") && !opt("file")) { console.log("usage: [GEL_CLICKS_TOKEN=key] gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]"); process.exit(2); }
+    // A click map that answers only its owner (Flisk Analytics) gets the key from GEL_CLICKS_TOKEN, sent as a Bearer header.
+    if (!opt("url") && !opt("file")) { console.log("usage: gel click-map (--url https://site/api/clicks?page=home&dev=mobile&days=30 | --file answer.json) [--merge] [--write docs/click-map.json] [--root .] [--json]"); process.exit(2); }
     let e;
-    try { e = await measureClicks({ url: opt("url"), file: opt("file") }); } catch (err) { console.error(`click-map: ${err.message}`); process.exit(1); }
+    try { e = await measureClicks({ url: opt("url"), file: opt("file"), token: process.env.GEL_CLICKS_TOKEN }); } catch (err) { console.error(`click-map: ${err.message}`); process.exit(1); }
     const out = opt("write");
     let entries = [e];
     if (out && args.includes("--merge") && existsSync(out)) { try { entries = [...JSON.parse(readFileSync(out, "utf8")).entries.filter((x) => x.page !== e.page || x.dev !== e.dev), e]; } catch {} }
@@ -308,6 +310,17 @@ async function main() {
     else console.log(`five-second: ${e.html ? "first screen kept" : "NO visible <h1> drawn"}${e.covered ? `, the headline is covered by ${e.covered}` : ""} for ${e.page} -> ${out}`);
     process.exit(e.html && !e.covered ? 0 : 1);
   }
+  if (cmd === "queue-ready") {
+    // gel queue-ready [--root .] [--repo o/n | --snapshot queue.json] [--json]: one preflight score before a merge queue (or a
+    // "GEL required" ruleset) is switched on. Offline unless --repo reads the ruleset; below 100 it exits 1.
+    const root = resolve(opt("root", "."));
+    const cfg = loadConfig(root);
+    const files = walk(root).filter((f) => !matchAny(cfg.ignore, f));
+    const queue = opt("snapshot") ? JSON.parse(readFileSync(opt("snapshot"), "utf8")) : opt("repo") ? collectQueue(opt("repo")) : undefined;
+    const card = scorecard({ files, read: (f) => readText(root, f), cfg, queue });
+    console.log(args.includes("--json") ? JSON.stringify(card, null, 1) : scorecardMarkdown(card));
+    process.exit(card.score === 100 ? 0 : 1);
+  }
   if (cmd === "lane") {
     const root = resolve(opt("root", "."));
     const cfg = loadConfig(root);
@@ -317,7 +330,7 @@ async function main() {
     if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, [`lane=${plan.lane}`, `lane_reason=${plan.reason}`, `scripts=${plan.scripts.join(" ")}`, `python_tests=${plan.pythonTests}`, `codeql=${plan.codeql}`].join("\n") + "\n");
     process.exit(0);
   }
-  if (cmd !== "run") { console.log("usage: gel five-second (--url u | --file f) [--write f] | gel click-map (--url u | --file f) [--merge] [--write f] | gel input-viewport (--url u | --file f) [--size WxH,..] [--write f] | gel north-star [--root .] [--measure] [--json] | gel brief [--root .] [--json] | gel lane [--root .] [--base <sha>] [--min A|B|C] [--json] | gel run [--root .] [--base <sha>] [--ctx ctx.json] [--record gel-record.jsonl] | gel selftest [--json] | gel factory (<prs.json> | --repo o/n [--limit 100]) [--json] | gel promote <gel-record.jsonl ...> [--labels f] [--root .] [--write] [--json] | gel metrics <gel-record.jsonl ...> [--labels gel-labels.json] [--json] | gel eval [selftest|collect --repo o/n] [--only a,b] [--runs runs.json] [--baseline b.json] [--record f] [--strict] [--json] | gel meta <gel-record.jsonl ...> [--evals f] [--outcomes f] | gel meta selftest | gel fix pinned-actions [--root .] [--repo owner/name] [--json] | gel release-ctx --repo owner/name --tag v1.2.3 [--sha s] [--phase pre|post]"); process.exit(2); }
+  if (cmd !== "run") { console.log("usage: gel queue-ready [--root .] [--repo o/n | --snapshot queue.json] [--json] | gel five-second (--url u | --file f) [--write f] | gel click-map (--url u | --file f) [--merge] [--write f] | gel input-viewport (--url u | --file f) [--size WxH,..] [--write f] | gel north-star [--root .] [--measure] [--json] | gel brief [--root .] [--json] | gel lane [--root .] [--base <sha>] [--min A|B|C] [--json] | gel run [--root .] [--base <sha>] [--ctx ctx.json] [--record gel-record.jsonl] | gel selftest [--json] | gel factory (<prs.json> | --repo o/n [--limit 100]) [--json] | gel promote <gel-record.jsonl ...> [--labels f] [--root .] [--write] [--json] | gel metrics <gel-record.jsonl ...> [--labels gel-labels.json] [--json] | gel eval [selftest|collect --repo o/n] [--only a,b] [--runs runs.json] [--baseline b.json] [--record f] [--strict] [--json] | gel meta <gel-record.jsonl ...> [--evals f] [--outcomes f] | gel meta selftest | gel fix pinned-actions [--root .] [--repo owner/name] [--json] | gel release-ctx --repo owner/name --tag v1.2.3 [--sha s] [--phase pre|post]"); process.exit(2); }
 
   const root = resolve(opt("root", "."));
   const cfg = loadConfig(root);

@@ -262,5 +262,49 @@
   "falseBlocks": 0,
   "wrong": [],
   "ok": true
+ },
+ {
+  "guard": "queue-merge-group-parity",
+  "cases": 16,
+  "good": 7,
+  "bad": 9,
+  "recall": 1,
+  "precision": 1,
+  "falseBlocks": 0,
+  "wrong": [],
+  "ok": true
+ },
+ {
+  "guard": "queue-cost-budget",
+  "cases": 10,
+  "good": 6,
+  "bad": 4,
+  "recall": 1,
+  "precision": 1,
+  "falseBlocks": 0,
+  "wrong": [],
+  "ok": true
+ },
+ {
+  "guard": "queue-main-duplicates",
+  "cases": 9,
+  "good": 6,
+  "bad": 3,
+  "recall": 1,
+  "precision": 1,
+  "falseBlocks": 0,
+  "wrong": [],
+  "ok": true
+ },
+ {
+  "guard": "queue-required-satisfiable",
+  "cases": 9,
+  "good": 6,
+  "bad": 3,
+  "recall": 1,
+  "precision": 1,
+  "falseBlocks": 0,
+  "wrong": [],
+  "ok": true
  }
 ]

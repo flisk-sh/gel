@@ -83,10 +83,11 @@ Planted defects are ones the bench inserted itself, so "caught" measures recall 
 | `dependabot-config` | an ecosystem in use is not covered by Dependabot or Renovate |
 | `adr-required`, `status-declared`, `north-star`, `product-brief` | opt-in: you declare a rule or a number in `docs/gel.json`, and GEL checks it |
 | `five-second-test`, `input-in-viewport`, `agent-readiness`, `ice-score`, `click-map` | a landing page, a phone input, agent-discovery files, an ICE table or a measured click map does not hold up |
+| `queue-merge-group-parity`, `queue-cost-budget`, `queue-main-duplicates`, `queue-required-satisfiable` | a merge queue would stall: a required check with no `merge_group` trigger, a shared concurrency group, a matrix over budget, a duplicate run on main, a ruleset rule nothing can satisfy. `gel queue-ready` scores all twelve items: [docs/queue.md](docs/queue.md) |
 
 `gel grade` grades `click-map`, `ice-score` and `product-brief` as bad, passed, good, high or super high. [`e2e/README.md`](e2e/README.md) gives the thresholds and shows which grades have a real example.
 
-The exact rules, options and edge cases for all 24 guards are in [docs/guards.md](docs/guards.md). `migrations-append-only`, `api-contract`, `tests-with-change`, `adr-required` and `stale-base` compare a PR with its base, so a push scan passes them.
+The exact rules, options and edge cases for all 28 guards are in [docs/guards.md](docs/guards.md). `migrations-append-only`, `api-contract`, `tests-with-change`, `adr-required` and `stale-base` compare a PR with its base, so a push scan passes them.
 
 ## Configure
 
