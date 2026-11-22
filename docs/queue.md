@@ -24,13 +24,28 @@ It prints a score out of 100 (checked items that pass), a pass or fail per item,
 | 5 | No queue entry runs a matrix over `queue.max_matrix_legs` (20). A run-time matrix declares its size under `queue.legs` | `queue-cost-budget` | [#4885](https://github.com/flisk-sh/flisk/pull/4885), [#2989](https://github.com/flisk-sh/flisk/pull/2989), [#4707](https://github.com/flisk-sh/flisk/pull/4707), [#3930](https://github.com/flisk-sh/flisk/pull/3930) |
 | 6 | A diff base in a `merge_group` workflow never reads `github.base_ref` or `github.event.pull_request.base.*`, which `merge_group` does not set. Use `github.event.merge_group.base_sha` or `HEAD^1`, or gate the step to `pull_request` | `queue-merge-group-parity` | [#3012](https://github.com/flisk-sh/flisk/pull/3012), [#4899](https://github.com/flisk-sh/flisk/pull/4899) |
 | 7 | A workflow that runs on `merge_group` does not also run on `push` to the default branch, unless `queue.main_duplicates` says why | `queue-main-duplicates` | [#4727](https://github.com/flisk-sh/flisk/pull/4727), [#4728](https://github.com/flisk-sh/flisk/pull/4728) |
-| 8 | A stalled-queue detector is installed (a workflow named for it, or a call to the shared one) | scorecard only | [#5105](https://github.com/flisk-sh/flisk/issues/5105), [#5114](https://github.com/flisk-sh/flisk/pull/5114) |
+| 8 | A stalled-queue detector is installed (a workflow named for it, or a call to the shared one) | scorecard only | [#5105](https://github.com/flisk-sh/flisk/issues/5105), [flisk-sh/.github#32](https://github.com/flisk-sh/.github/pull/32) |
 | 9 | A dead-batch run canceller is installed | scorecard only | [#3014](https://github.com/flisk-sh/flisk/pull/3014), [#4093](https://github.com/flisk-sh/flisk/pull/4093) |
 | 10 | A `run` step with bash-only syntax sets `shell: bash` where the default shell is not bash: any bash syntax on a Windows job, `mapfile`, `readarray` and `declare -A` on a macOS job | `queue-merge-group-parity` | [#4906](https://github.com/flisk-sh/flisk/pull/4906), [#4913](https://github.com/flisk-sh/flisk/pull/4913) |
 | 11 | Steps listed under `queue.flaky_steps` are wrapped in a retry: a red entry dequeues everything behind it | scorecard only | [#4691](https://github.com/flisk-sh/flisk/pull/4691), [#4688](https://github.com/flisk-sh/flisk/pull/4688), [#4879](https://github.com/flisk-sh/flisk/pull/4879) |
 | 12 | Every active ruleset rule can be satisfied: each required check, code scanning tool or coverage uploader has reported at least once on a `merge_group` or default-branch commit | `queue-required-satisfiable` (online) | [#3184](https://github.com/flisk-sh/flisk/pull/3184), [#3185](https://github.com/flisk-sh/flisk/pull/3185), [#2988](https://github.com/flisk-sh/flisk/pull/2988) |
 
 Items 1 to 7, 10 and 12 are guards that run in `gel run` like any other (in `report` mode until a person promotes them, see [guards](guards.md)). Items 8, 9 and 11 look at what is installed, so only the scorecard reports them.
+
+### Install the stalled-queue detector (item 8)
+
+Copy the [Flisk stalled merge queue starter](https://github.com/flisk-sh/.github/blob/main/workflow-templates/flisk-stalled-merge-queue.yml) to `.github/workflows/`. It runs on a `*/15` schedule, `merge_group`, `pull_request: [dequeued]` and `workflow_dispatch`, and calls the shared workflow. Pin the workflow to a commit and pass the same commit as `scripts_ref`, because the script is read from that ref, not from your repo:
+
+```yaml
+jobs:
+  unstall:
+    permissions: { contents: read, actions: read, pull-requests: write, issues: write }
+    uses: flisk-sh/.github/.github/workflows/stalled-merge-queue.yml@28a7fad96298d2f1f22ca839b208324e8841cdee
+    with:
+      scripts_ref: 28a7fad96298d2f1f22ca839b208324e8841cdee
+```
+
+The caller must grant those four permissions, since a reusable workflow can only lower them. Pass a `token` secret only if `GITHUB_TOKEN` cannot dequeue or enqueue. Item 8 passes for a workflow named for a stalled queue or a `uses:` of one.
 
 ## What it reads
 
@@ -74,4 +89,4 @@ A `code_coverage` or `code_quality` rule needs an uploader outside the repo's ow
 | [#4727](https://github.com/flisk-sh/flisk/pull/4727) and [#4728](https://github.com/flisk-sh/flisk/pull/4728) | 7 (push to main and `merge_group`) |
 | [#4906](https://github.com/flisk-sh/flisk/pull/4906) | 10 (`mapfile` on a macOS job, no `shell`) |
 
-Not covered by a guard yet: class 5's `merge_group.base_sha` that a depth-1 checkout could not fetch ([#4899](https://github.com/flisk-sh/flisk/pull/4899)) needs a shell reader; the queue metrics and the bench ratchet; the shared stalled-queue workflow in `flisk-sh/.github`; and `stale-base` on `merge_group` events.
+Not covered by a guard yet: class 5's `merge_group.base_sha` that a depth-1 checkout could not fetch ([#4899](https://github.com/flisk-sh/flisk/pull/4899)) needs a shell reader; the queue metrics and the bench ratchet; and `stale-base` on `merge_group` events.
