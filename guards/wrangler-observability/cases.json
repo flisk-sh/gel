@@ -1,0 +1,66 @@
+[
+  {
+    "name": "no wrangler file in repo",
+    "label": "good",
+    "files": {
+      "README.md": "# Demo\n",
+      "package.json": "{\"name\": \"demo\"}\n"
+    }
+  },
+  {
+    "name": "wrangler.toml with observability enabled",
+    "label": "good",
+    "files": {
+      "wrangler.toml": "name = \"my-worker\"\nmain = \"src/index.ts\"\n\n[observability]\nenabled = true\n"
+    }
+  },
+  {
+    "name": "wrangler.json with observability enabled",
+    "label": "good",
+    "files": {
+      "wrangler.json": "{\n  \"name\": \"my-worker\",\n  \"observability\": {\n    \"enabled\": true\n  }\n}\n"
+    }
+  },
+  {
+    "name": "wrangler.jsonc with comments and observability enabled",
+    "label": "good",
+    "files": {
+      "wrangler.jsonc": "{\n  // Worker name\n  \"name\": \"my-worker\",\n  \"observability\": {\n    // Keep logs\n    \"enabled\": true\n  }\n}\n"
+    }
+  },
+  {
+    "name": "wrangler.toml missing observability block",
+    "label": "bad",
+    "files": {
+      "wrangler.toml": "name = \"my-worker\"\nmain = \"src/index.ts\"\n"
+    }
+  },
+  {
+    "name": "wrangler.toml with observability disabled",
+    "label": "bad",
+    "files": {
+      "wrangler.toml": "name = \"my-worker\"\n[observability]\nenabled = false\n"
+    }
+  },
+  {
+    "name": "wrangler.json missing observability block",
+    "label": "bad",
+    "files": {
+      "wrangler.json": "{\n  \"name\": \"my-worker\"\n}\n"
+    }
+  },
+  {
+    "name": "wrangler.json with observability disabled",
+    "label": "bad",
+    "files": {
+      "wrangler.json": "{\n  \"name\": \"my-worker\",\n  \"observability\": {\n    \"enabled\": false\n  }\n}\n"
+    }
+  },
+  {
+    "name": "wrangler.jsonc with observability false",
+    "label": "bad",
+    "files": {
+      "wrangler.jsonc": "{\n  // Worker config\n  \"name\": \"my-worker\",\n  \"observability\": {\n    \"enabled\": false\n  }\n}\n"
+    }
+  }
+]

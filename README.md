@@ -92,6 +92,7 @@ Planted defects are ones the bench inserted itself, so "caught" measures recall 
 | `next-cta` | a landing page does not mark its one most likely next action: no element, or more than one, has `data-next-cta`, it lacks the `next-cta` class, it is not the first link, button or input under the `<h1>`, or the page has no spinning-border CSS with a reduced-motion fallback ([recipe](docs/next-cta.css)) |
 | `five-second-test`, `input-in-viewport`, `agent-readiness`, `ice-score`, `click-map` | a landing page, a phone input, agent-discovery files, an ICE table or a measured click map does not hold up |
 | `queue-merge-group-parity`, `queue-cost-budget`, `queue-main-duplicates`, `queue-required-satisfiable` | a merge queue would stall: a required check with no `merge_group` trigger, a shared concurrency group, a matrix over budget, a duplicate run on main, a ruleset rule nothing can satisfy. `gel queue-ready` scores all twelve items: [docs/queue.md](docs/queue.md) |
+| `worker-request-budget`, `wrangler-observability` | a Cloudflare Worker is eating the free daily request budget, or a Worker's wrangler config (`wrangler.toml`, `wrangler.json`, `wrangler.jsonc`) has no `observability.enabled = true` so logs are lost |
 
 `gel grade` grades `click-map`, `ice-score` and `product-brief` as bad, passed, good, high or super high. [`e2e/README.md`](e2e/README.md) gives the thresholds and shows which grades have a real example.
 

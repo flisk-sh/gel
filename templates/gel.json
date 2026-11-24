@@ -29,6 +29,7 @@
     "log-injection": "report",
     "workflow-checkout-safety": "report",
     "model-deprecation": "report",
+    "wrangler-observability": "report",
     "stale-base": "block"
   }
 }
