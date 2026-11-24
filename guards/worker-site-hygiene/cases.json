@@ -1,0 +1,93 @@
+[
+ {
+  "name": "too many google font families",
+  "label": "bad",
+  "files": {
+   "index.html": "<html><head><link rel=\"apple-touch-icon\" href=\"/icon.png\"><link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Inter&family=Roboto&family=Fira+Code\"></head><body>Hi</body></html>"
+  }
+ },
+ {
+  "name": "missing apple-touch-icon",
+  "label": "bad",
+  "files": {
+   "index.html": "<html><head><title>Hi</title></head><body>Hi</body></html>"
+  }
+ },
+ {
+  "name": "page exceeds byte budget",
+  "label": "bad",
+  "files": {
+   "index.html": "<html><head><link rel=\"apple-touch-icon\" href=\"/icon.png\"></head><body>Hello</body></html>"
+  },
+  "cfg": {
+   "worker_site_hygiene": {
+    "max_bytes": 50
+   }
+  }
+ },
+ {
+  "name": "measurement missing Permissions-Policy and llms.txt",
+  "label": "bad",
+  "ctx": {
+   "now": "2026-11-17T00:00:00Z"
+  },
+  "files": {
+   "bench/site-hygiene.json": "{\"measuredAt\":\"2026-11-10T00:00:00Z\",\"permissionsPolicy\":false,\"httpsRedirect\":true,\"robotsCacheControl\":\"public, max-age=3600\",\"securityTxt\":true,\"llmsTxt\":false,\"notFoundBytes\":1024}"
+  }
+ },
+ {
+  "name": "measurement stale",
+  "label": "bad",
+  "ctx": {
+   "now": "2026-11-17T00:00:00Z"
+  },
+  "files": {
+   "bench/site-hygiene.json": "{\"measuredAt\":\"2026-08-01T00:00:00Z\",\"permissionsPolicy\":true,\"httpsRedirect\":true,\"robotsCacheControl\":true,\"securityTxt\":true,\"llmsTxt\":true,\"notFoundBytes\":1024}"
+  }
+ },
+ {
+  "name": "404 page too large",
+  "label": "bad",
+  "ctx": {
+   "now": "2026-11-17T00:00:00Z"
+  },
+  "files": {
+   "bench/site-hygiene.json": "{\"measuredAt\":\"2026-11-10T00:00:00Z\",\"permissionsPolicy\":true,\"httpsRedirect\":true,\"robotsCacheControl\":true,\"securityTxt\":true,\"llmsTxt\":true,\"notFoundBytes\":65536}"
+  }
+ },
+ {
+  "name": "clean html page within budgets",
+  "label": "good",
+  "files": {
+   "index.html": "<html><head><link rel=\"apple-touch-icon\" href=\"/icon.png\"><link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Inter&family=Fira+Code\"></head><body>Hi</body></html>"
+  }
+ },
+ {
+  "name": "clean html and fresh passing measurement",
+  "label": "good",
+  "ctx": {
+   "now": "2026-11-17T00:00:00Z"
+  },
+  "files": {
+   "index.html": "<html><head><link rel=\"apple-touch-icon\" href=\"/icon.png\"></head><body>Hi</body></html>",
+   "bench/site-hygiene.json": "{\"measuredAt\":\"2026-11-10T00:00:00Z\",\"permissionsPolicy\":\"camera=(), microphone=()\",\"httpsRedirect\":true,\"robotsCacheControl\":\"public, max-age=3600\",\"securityTxt\":true,\"llmsTxt\":true,\"notFoundBytes\":2048}"
+  }
+ },
+ {
+  "name": "no html pages or measurement",
+  "label": "good",
+  "files": {
+   "README.md": "hello\n"
+  }
+ },
+ {
+  "name": "archived repo skips checks",
+  "label": "good",
+  "files": {
+   "index.html": "<html><body>No icon</body></html>"
+  },
+  "cfg": {
+   "status": "archived"
+  }
+ }
+]
