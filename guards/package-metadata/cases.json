@@ -1,0 +1,95 @@
+[
+  {
+    "name": "no package.json",
+    "label": "good",
+    "files": {
+      "README.md": "# test\n"
+    }
+  },
+  {
+    "name": "valid public package",
+    "label": "good",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"MIT\",\"repository\":\"https://github.com/foo/bar\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n\nCopyright (c) 2026\n"
+    }
+  },
+  {
+    "name": "valid public package with repository object",
+    "label": "good",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"MIT\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/foo/bar.git\"},\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n\nCopyright (c) 2026\n"
+    }
+  },
+  {
+    "name": "valid private package with minimal metadata",
+    "label": "good",
+    "files": {
+      "package.json": "{\"name\":\"private-app\",\"private\":true,\"license\":\"MIT\",\"engines\":{\"node\":\">=20\"}}",
+      "LICENSE": "MIT License\n\nCopyright (c) 2026\n"
+    }
+  },
+  {
+    "name": "valid Apache-2.0 package matching LICENSE",
+    "label": "good",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"Apache-2.0\",\"repository\":\"https://github.com/foo/bar\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "Apache License\nVersion 2.0, January 2004\n"
+    }
+  },
+  {
+    "name": "missing license",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"repository\":\"https://github.com/foo/bar\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n"
+    }
+  },
+  {
+    "name": "license mismatch with LICENSE file",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"Apache-2.0\",\"repository\":\"https://github.com/foo/bar\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n\nCopyright (c) 2026\n"
+    }
+  },
+  {
+    "name": "missing engines",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"MIT\",\"repository\":\"https://github.com/foo/bar\"}",
+      "LICENSE": "MIT License\n"
+    }
+  },
+  {
+    "name": "missing description in public package",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"license\":\"MIT\",\"repository\":\"https://github.com/foo/bar\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n"
+    }
+  },
+  {
+    "name": "missing repository in public package",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"pkg\",\"version\":\"1.0.0\",\"description\":\"A tool\",\"license\":\"MIT\",\"engines\":{\"node\":\">=18\"}}",
+      "LICENSE": "MIT License\n"
+    }
+  },
+  {
+    "name": "private package missing license",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"app\",\"private\":true,\"engines\":{\"node\":\">=18\"}}"
+    }
+  },
+  {
+    "name": "private package missing engines",
+    "label": "bad",
+    "files": {
+      "package.json": "{\"name\":\"app\",\"private\":true,\"license\":\"MIT\"}}"
+    }
+  }
+]

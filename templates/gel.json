@@ -11,6 +11,7 @@
     "tests-with-change": "report",
     "adr-required": "report",
     "repo-health": "report",
+    "package-metadata": "report",
     "status-declared": "report",
     "dependabot-config": "report",
     "gitattributes-eol": "report",

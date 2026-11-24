@@ -81,6 +81,7 @@ Planted defects are ones the bench inserted itself, so "caught" measures recall 
 | `stale-base` | a PR branch was cut before the base changed its CI or scoring files |
 | `release-integrity` | a release has a non-SemVer tag, no CHANGELOG entry, a red check or assets without checksums |
 | `repo-health` | the repo has no LICENSE, SECURITY.md, CONTRIBUTING.md or CODEOWNERS |
+| `package-metadata` | a `package.json` lacks `license` (matching the LICENSE file's SPDX id), `engines`, `description` or `repository` (`private: true` skips repository/description) |
 | `dependabot-config` | an ecosystem in use is not covered by Dependabot or Renovate |
 | `gitattributes-eol` | a `.gitattributes` line-ending rule has no `eol=lf` as its only eol setting (the Claude plugin directory refuses the repo) |
 | `sonar-patterns` | a bash script tests with `[ ]` instead of `[[ ]]`, or a non-test `.ts` file has a backtracking-prone regex (the two SonarCloud findings that keep coming back). Existing hits are frozen in `docs/gel.json` under `sonar_patterns.baseline` (file to count); a file may only get cleaner |

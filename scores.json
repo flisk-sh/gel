@@ -132,6 +132,17 @@
   "ok": true
  },
  {
+  "guard": "package-metadata",
+  "cases": 12,
+  "good": 5,
+  "bad": 7,
+  "recall": 1,
+  "precision": 1,
+  "falseBlocks": 0,
+  "wrong": [],
+  "ok": true
+ },
+ {
   "guard": "status-declared",
   "cases": 9,
   "good": 5,
