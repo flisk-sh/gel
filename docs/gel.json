@@ -9,5 +9,6 @@
     "evidence": "docs/north-star/README.md",
     "measure": "node bench/north-star.mjs --work ~/.gel-bench-work",
     "max_age_days": 90
-  }
+  },
+  "ignore": ["**/cases.json"]
 }

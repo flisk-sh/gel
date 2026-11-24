@@ -16,6 +16,11 @@ test("keys with colons", () => {
   assert.deepEqual(parseYaml("/v2/actors/{id}/limits:clear:\n  post: {}\n"), { "/v2/actors/{id}/limits:clear": { post: {} } });
 });
 
+test("doubled apostrophes in flow mapping keys and sequence values", () => {
+  const y = "labels: {'owner''s view': ['don''t know, yet', 'can''t say'], other: ['yes']}\n";
+  assert.deepEqual(parseYaml(y), { labels: { "owner's view": ["don't know, yet", "can't say"], other: ["yes"] } });
+});
+
 test("anchors and aliases throw, so the guard skips the file", () => {
   assert.throws(() => parseYaml("a: &x\n  b: 1\nc: *x\n"));
 });
