@@ -29,6 +29,7 @@
     "log-injection": "report",
     "workflow-checkout-safety": "report",
     "model-deprecation": "report",
+    "html-a11y-basics": "report",
     "stale-base": "block"
   }
 }

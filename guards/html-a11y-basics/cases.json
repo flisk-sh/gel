@@ -1,0 +1,86 @@
+[
+ {
+  "name": "no main landmark and no skip link",
+  "label": "bad",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><header><nav><a href=\"/\">Home</a></nav></header><div class=\"content\"><h1>Hello</h1><p>Welcome</p></div></body></html>"
+  }
+ },
+ {
+  "name": "has main but no skip link",
+  "label": "bad",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><header><nav><a href=\"/\">Home</a></nav></header><main id=\"main\"><h1>Hello</h1><p>Welcome</p></main></body></html>"
+  }
+ },
+ {
+  "name": "has skip link but no main landmark",
+  "label": "bad",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><a href=\"#main\" class=\"skip-link\">Skip to content</a><header><nav><a href=\"/\">Home</a></nav></header><div id=\"main\"><h1>Hello</h1><p>Welcome</p></div></body></html>"
+  }
+ },
+ {
+  "name": "skip link not first in body",
+  "label": "bad",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><header><nav><a href=\"/\">Home</a></nav></header><a href=\"#main\">Skip to content</a><main id=\"main\"><h1>Hello</h1></main></body></html>"
+  }
+ },
+ {
+  "name": "skip link targets other anchor instead of main or content",
+  "label": "bad",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><a href=\"#nav\">Skip to navigation</a><main id=\"main\"><h1>Hello</h1></main></body></html>"
+  }
+ },
+ {
+  "name": "valid page with main tag and #main skip link",
+  "label": "good",
+  "files": {
+   "index.html": "<!DOCTYPE html><html><body><a href=\"#main\" class=\"sr-only\">Skip to content</a><header><nav><a href=\"/\">Home</a></nav></header><main id=\"main\"><h1>Hello</h1><p>Welcome</p></main></body></html>"
+  }
+ },
+ {
+  "name": "valid page with role=main and #content skip link",
+  "label": "good",
+  "files": {
+   "public/index.html": "<!DOCTYPE html><html><body><a href=\"#content\">Skip to content</a><div role=\"main\" id=\"content\"><h1>Hello</h1></div></body></html>"
+  }
+ },
+ {
+  "name": "no landing pages present",
+  "label": "good",
+  "files": {
+   "README.md": "# Readme\n"
+  }
+ },
+ {
+  "name": "custom configured page in worker template with template string syntax",
+  "label": "good",
+  "files": {
+   "src/page.ts": "export const html = `<!DOCTYPE html><html><body><a href=\"#main\">Skip to content</a><main id=\"main\"><h1>Title</h1></main></body></html>`;"
+  },
+  "cfg": {
+   "html_a11y": {
+    "pages": [
+     "src/page.ts"
+    ]
+   }
+  }
+ },
+ {
+  "name": "custom configured page missing main",
+  "label": "bad",
+  "files": {
+   "src/page.ts": "export const html = `<!DOCTYPE html><html><body><a href=\"#main\">Skip to content</a><div><h1>Title</h1></div></body></html>`;"
+  },
+  "cfg": {
+   "html_a11y": {
+    "pages": [
+     "src/page.ts"
+    ]
+   }
+  }
+ }
+]
