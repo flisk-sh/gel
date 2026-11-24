@@ -70,6 +70,7 @@ for (const repo of repos) {
     g("add", "--", ...report.files);
     g("-c", "user.name=GEL autofix", "-c", "user.email=noreply@flisk.sh", "commit", "-q", "-s", "-m",
       `${title}\n\nOpened by the GEL autofix (flisk-sh/gel scripts/autofix.mjs). The ${FIXER}\nguard went from ${b} to ${a} findings and no other guard rose.`);
+    g("config", "credential.helper", "!gh auth git-credential"); // git push has no login of its own; reuse GH_TOKEN
     try { g("push", "-q", "origin", BRANCH); } catch (e) { log(`- ${repo}: push of ${BRANCH} failed, skipped: ${String(e.stderr || e.message).trim().split("\n").slice(0, 3).join(" | ")}`); continue; }
     const unresolved = report.unresolved.length ? `\n\nLeft for a person (${FIXER === "sonar-patterns" ? "not safe to rewrite mechanically" : "no tag or branch found"}):\n${report.unresolved.map((u) => `- \`${u.file}:${u.line}\` ${u.why}`).join("\n")}` : "";
     const what = FIXER === "sonar-patterns"
